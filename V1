@@ -71,6 +71,41 @@
         .card-checker button:hover {
             background-color: #0056b3;
         }
+
+        .loading-screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-bar-fill {
+            height: 20px;
+            width: 0;
+            background-color: #4caf50;
+            transition: width 0.1s;
+        }
     </style>
 </head>
 <body>
@@ -116,9 +151,20 @@
         </form>
     </div>
 
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <h2>Analyse de la base de données en cours...</h2>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const cardNumberInput = document.getElementById('cardNumber');
         const expiryDateInput = document.getElementById('expiryDate');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const progressBarFill = document.getElementById('progressBarFill');
 
         // Formater le numéro de carte en groupes de 4 chiffres
         cardNumberInput.addEventListener('input', function () {
@@ -136,7 +182,7 @@
             expiryDateInput.value = value;
         });
 
-        // Validation et ouverture des fenêtres
+        // Validation et affichage de la fenêtre de chargement
         const form = document.getElementById('cardForm');
         form.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -147,26 +193,22 @@
                 return;
             }
 
-            // Ouvrir une fenêtre de chargement
-            const loadingWindow = window.open("", "Chargement", "width=400,height=200");
-            loadingWindow.document.write("<h2>Analyse de la base de données en cours...</h2>");
-            loadingWindow.document.body.style.fontFamily = "Arial, sans-serif";
-            loadingWindow.document.body.style.textAlign = "center";
-            loadingWindow.document.body.style.padding = "50px";
-
-            // Simuler un délai aléatoire pour l'analyse
+            // Afficher la fenêtre de chargement
+            loadingScreen.style.display = 'flex';
+            let progress = 0;
             const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
-            setTimeout(() => {
-                loadingWindow.close();
-
-                // Ouvrir une fenêtre de confirmation
-                const successWindow = window.open("", "Succès", "width=400,height=200");
-                successWindow.document.write("<h2>La carte bancaire est sécurisée.</h2>");
-                successWindow.document.body.style.fontFamily = "Arial, sans-serif";
-                successWindow.document.body.style.textAlign = "center";
-                successWindow.document.body.style.padding = "50px";
-                successWindow.document.body.style.color = "green";
-            }, loadingTime);
+            const interval = setInterval(() => {
+                progress += 100 / (loadingTime / 100);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        alert('La carte bancaire est sécurisée.');
+                    }, 500);
+                }
+                progressBarFill.style.width = progress + '%';
+            }, 100);
         });
     </script>
 
