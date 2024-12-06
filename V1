@@ -20,47 +20,48 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 300px;
+            width: 350px;
             text-align: center;
         }
 
         .card-checker h1 {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             margin-bottom: 20px;
         }
 
         .card-checker input {
             width: 100%;
-            padding: 10px;
+            padding: 15px;
             margin: 10px 0;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         .card-checker input:invalid {
             border-color: red;
         }
 
+        .card-checker input:valid {
+            border-color: green;
+            box-shadow: 0 0 5px green;
+        }
+
         .card-checker button {
             width: 100%;
-            padding: 10px;
+            padding: 15px;
             background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 1rem;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         .card-checker button:hover {
             background-color: #0056b3;
-        }
-
-        .error-message {
-            color: red;
-            font-size: 0.9rem;
-            display: none;
         }
     </style>
 </head>
@@ -74,33 +75,33 @@
                 type="text" 
                 id="cardNumber" 
                 placeholder="Numéro de carte (16 chiffres)" 
-                pattern="^\d{16}$" 
+                maxlength="19" 
                 required 
-                title="Le numéro doit contenir exactement 16 chiffres"
+                pattern="^(\d{4} ){3}\d{4}$" 
+                title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
             >
-            <div id="cardNumberError" class="error-message">Le numéro de carte doit contenir exactement 16 chiffres.</div>
 
             <!-- Champ pour la date d'expiration -->
             <input 
                 type="text" 
                 id="expiryDate" 
                 placeholder="Date d'expiration (MM/AA)" 
-                pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
+                maxlength="5" 
                 required 
+                pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
                 title="Le format doit être MM/AA"
             >
-            <div id="expiryDateError" class="error-message">La date doit être au format MM/AA.</div>
 
             <!-- Champ pour le CCV -->
             <input 
                 type="text" 
                 id="ccv" 
                 placeholder="CCV (3 chiffres)" 
-                pattern="^\d{3}$" 
+                maxlength="3" 
                 required 
+                pattern="^\d{3}$" 
                 title="Le CCV doit contenir exactement 3 chiffres"
             >
-            <div id="ccvError" class="error-message">Le CCV doit contenir exactement 3 chiffres.</div>
 
             <!-- Bouton de validation -->
             <button type="submit">Valider</button>
@@ -108,45 +109,21 @@
     </div>
 
     <script>
+        const cardNumberInput = document.getElementById('cardNumber');
+
+        // Formater le numéro de carte en groupes de 4 chiffres
+        cardNumberInput.addEventListener('input', function (event) {
+            let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
+            const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
+            cardNumberInput.value = formattedValue;
+        });
+
+        // Ajout de validations sur le formulaire
         const form = document.getElementById('cardForm');
-
-        // Ajout des contrôles et des messages d'erreur
         form.addEventListener('submit', function (event) {
-            let isValid = true;
-
-            // Vérification du numéro de carte
-            const cardNumber = document.getElementById('cardNumber');
-            const cardNumberError = document.getElementById('cardNumberError');
-            if (!cardNumber.validity.valid) {
-                cardNumberError.style.display = 'block';
-                isValid = false;
-            } else {
-                cardNumberError.style.display = 'none';
-            }
-
-            // Vérification de la date d'expiration
-            const expiryDate = document.getElementById('expiryDate');
-            const expiryDateError = document.getElementById('expiryDateError');
-            if (!expiryDate.validity.valid) {
-                expiryDateError.style.display = 'block';
-                isValid = false;
-            } else {
-                expiryDateError.style.display = 'none';
-            }
-
-            // Vérification du CCV
-            const ccv = document.getElementById('ccv');
-            const ccvError = document.getElementById('ccvError');
-            if (!ccv.validity.valid) {
-                ccvError.style.display = 'block';
-                isValid = false;
-            } else {
-                ccvError.style.display = 'none';
-            }
-
-            // Empêche l'envoi du formulaire si une erreur est détectée
-            if (!isValid) {
+            if (!form.checkValidity()) {
                 event.preventDefault();
+                alert('Veuillez corriger les erreurs dans le formulaire.');
             } else {
                 alert('Carte validée avec succès !');
             }
