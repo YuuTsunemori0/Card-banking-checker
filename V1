@@ -47,13 +47,32 @@
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        .card-checker input:invalid {
+        .card-checker input.has-input:invalid {
             border-color: red;
         }
 
-        .card-checker input:valid {
+        .card-checker input.has-input:valid {
             border-color: green;
             box-shadow: 0 0 5px green;
+        }
+
+        .card-checker .input-group div {
+            position: relative;
+        }
+
+        .card-checker .input-group .icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .card-checker .input-group .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
         }
 
         .card-checker button {
@@ -106,6 +125,11 @@
             background-color: #4caf50;
             transition: width 0.1s;
         }
+
+        .loading-step {
+            margin-top: 10px;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -115,37 +139,49 @@
         <form id="cardForm">
             <div class="input-group">
                 <!-- Champ pour le numéro de carte -->
-                <input 
-                    type="text" 
-                    id="cardNumber" 
-                    placeholder="Numéro de carte (16 chiffres)" 
-                    maxlength="19" 
-                    required 
-                    pattern="^(\d{4} ){3}\d{4}$" 
-                    title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
-                >
+                <div>
+                    <input 
+                        type="text" 
+                        id="cardNumber" 
+                        placeholder="Numéro de carte (16 chiffres)" 
+                        maxlength="19" 
+                        required 
+                        pattern="^(\d{4} ){3}\d{4}$" 
+                        title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
+                    >
+                    <span class="icon" id="cardNumberIcon"></span>
+                    <div class="error-message" id="cardNumberError">Le numéro de carte doit contenir exactement 16 chiffres.</div>
+                </div>
 
                 <!-- Champ pour la date d'expiration -->
-                <input 
-                    type="text" 
-                    id="expiryDate" 
-                    placeholder="Date d'expiration (MM/AA)" 
-                    maxlength="5" 
-                    required 
-                    pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
-                    title="Le format doit être MM/AA"
-                >
+                <div>
+                    <input 
+                        type="text" 
+                        id="expiryDate" 
+                        placeholder="Date d'expiration (MM/AA)" 
+                        maxlength="5" 
+                        required 
+                        pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
+                        title="Le format doit être MM/AA"
+                    >
+                    <span class="icon" id="expiryDateIcon"></span>
+                    <div class="error-message" id="expiryDateError">La date d'expiration doit être au format MM/AA.</div>
+                </div>
 
                 <!-- Champ pour le CCV -->
-                <input 
-                    type="text" 
-                    id="ccv" 
-                    placeholder="CCV (3 chiffres)" 
-                    maxlength="3" 
-                    required 
-                    pattern="^\d{3}$" 
-                    title="Le CCV doit contenir exactement 3 chiffres"
-                >
+                <div>
+                    <input 
+                        type="text" 
+                        id="ccv" 
+                        placeholder="CCV (3 chiffres)" 
+                        maxlength="3" 
+                        required 
+                        pattern="^\d{3}$" 
+                        title="Le CCV doit contenir exactement 3 chiffres"
+                    >
+                    <span class="icon" id="ccvIcon"></span>
+                    <div class="error-message" id="ccvError">Le CCV doit contenir exactement 3 chiffres.</div>
+                </div>
             </div>
             <button type="submit">Valider</button>
         </form>
@@ -157,20 +193,41 @@
             <div class="progress-bar">
                 <div class="progress-bar-fill" id="progressBarFill"></div>
             </div>
+            <div class="loading-step" id="loadingStep"></div>
         </div>
     </div>
 
     <script>
         const cardNumberInput = document.getElementById('cardNumber');
         const expiryDateInput = document.getElementById('expiryDate');
+        const ccvInput = document.getElementById('ccv');
         const loadingScreen = document.getElementById('loadingScreen');
         const progressBarFill = document.getElementById('progressBarFill');
+        const loadingStep = document.getElementById('loadingStep');
+
+        const cardNumberIcon = document.getElementById('cardNumberIcon');
+        const expiryDateIcon = document.getElementById('expiryDateIcon');
+        const ccvIcon = document.getElementById('ccvIcon');
 
         // Formater le numéro de carte en groupes de 4 chiffres
         cardNumberInput.addEventListener('input', function () {
             let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
             const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
             cardNumberInput.value = formattedValue;
+            if (value.length > 0) {
+                cardNumberInput.classList.add('has-input');
+                if (cardNumberInput.validity.valid) {
+                    cardNumberIcon.textContent = '✔️';
+                    document.getElementById('cardNumberError').style.display = 'none';
+                } else {
+                    cardNumberIcon.textContent = '❌';
+                    document.getElementById('cardNumberError').style.display = 'block';
+                }
+            } else {
+                cardNumberInput.classList.remove('has-input');
+                cardNumberIcon.textContent = '';
+                document.getElementById('cardNumberError').style.display = 'none';
+            }
         });
 
         // Formater la date d'expiration en MM/AA
@@ -180,6 +237,38 @@
                 value = value.substring(0, 2) + '/' + value.substring(2); // Ajouter un '/' après MM
             }
             expiryDateInput.value = value;
+            if (value.length > 0) {
+                expiryDateInput.classList.add('has-input');
+                if (expiryDateInput.validity.valid) {
+                    expiryDateIcon.textContent = '✔️';
+                    document.getElementById('expiryDateError').style.display = 'none';
+                } else {
+                    expiryDateIcon.textContent = '❌';
+                    document.getElementById('expiryDateError').style.display = 'block';
+                }
+            } else {
+                expiryDateInput.classList.remove('has-input');
+                expiryDateIcon.textContent = '';
+                document.getElementById('expiryDateError').style.display = 'none';
+            }
+        });
+
+        // Gérer l'état du champ CCV
+        ccvInput.addEventListener('input', function () {
+            if (ccvInput.value.length > 0) {
+                ccvInput.classList.add('has-input');
+                if (ccvInput.validity.valid) {
+                    ccvIcon.textContent = '✔️';
+                    document.getElementById('ccvError').style.display = 'none';
+                } else {
+                    ccvIcon.textContent = '❌';
+                    document.getElementById('ccvError').style.display = 'block';
+                }
+            } else {
+                ccvInput.classList.remove('has-input');
+                ccvIcon.textContent = '';
+                document.getElementById('ccvError').style.display = 'none';
+            }
         });
 
         // Validation et affichage de la fenêtre de chargement
@@ -196,6 +285,14 @@
             // Afficher la fenêtre de chargement
             loadingScreen.style.display = 'flex';
             let progress = 0;
+            const steps = [
+                "Vérification des informations...",
+                "Connexion à la banque...",
+                "Analyse des données...",
+                "Validation terminée."
+            ];
+            let currentStep = 0;
+            loadingStep.textContent = steps[currentStep];
             const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
             const interval = setInterval(() => {
                 progress += 100 / (loadingTime / 100);
@@ -208,6 +305,10 @@
                     }, 500);
                 }
                 progressBarFill.style.width = progress + '%';
+                if (progress >= (100 / steps.length) * (currentStep + 1) && currentStep < steps.length - 1) {
+                    currentStep++;
+                    loadingStep.textContent = steps[currentStep];
+                }
             }, 100);
         });
     </script>
