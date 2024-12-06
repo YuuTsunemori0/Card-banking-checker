@@ -30,10 +30,17 @@
             margin-bottom: 20px;
         }
 
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
         .card-checker input {
             width: calc(100% - 20px);
             padding: 10px;
-            margin: 10px 0;
+            margin: 0 auto;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 1rem;
@@ -71,40 +78,40 @@
     <div class="card-checker">
         <h1>Vérificateur de Carte Bancaire</h1>
         <form id="cardForm">
-            <!-- Champ pour le numéro de carte -->
-            <input 
-                type="text" 
-                id="cardNumber" 
-                placeholder="Numéro de carte (16 chiffres)" 
-                maxlength="19" 
-                required 
-                pattern="^(\d{4} ){3}\d{4}$" 
-                title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
-            >
+            <div class="input-group">
+                <!-- Champ pour le numéro de carte -->
+                <input 
+                    type="text" 
+                    id="cardNumber" 
+                    placeholder="Numéro de carte (16 chiffres)" 
+                    maxlength="19" 
+                    required 
+                    pattern="^(\d{4} ){3}\d{4}$" 
+                    title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
+                >
 
-            <!-- Champ pour la date d'expiration -->
-            <input 
-                type="text" 
-                id="expiryDate" 
-                placeholder="Date d'expiration (MM/AA)" 
-                maxlength="5" 
-                required 
-                pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
-                title="Le format doit être MM/AA"
-            >
+                <!-- Champ pour la date d'expiration -->
+                <input 
+                    type="text" 
+                    id="expiryDate" 
+                    placeholder="Date d'expiration (MM/AA)" 
+                    maxlength="5" 
+                    required 
+                    pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
+                    title="Le format doit être MM/AA"
+                >
 
-            <!-- Champ pour le CCV -->
-            <input 
-                type="text" 
-                id="ccv" 
-                placeholder="CCV (3 chiffres)" 
-                maxlength="3" 
-                required 
-                pattern="^\d{3}$" 
-                title="Le CCV doit contenir exactement 3 chiffres"
-            >
-
-            <!-- Bouton de validation -->
+                <!-- Champ pour le CCV -->
+                <input 
+                    type="text" 
+                    id="ccv" 
+                    placeholder="CCV (3 chiffres)" 
+                    maxlength="3" 
+                    required 
+                    pattern="^\d{3}$" 
+                    title="Le CCV doit contenir exactement 3 chiffres"
+                >
+            </div>
             <button type="submit">Valider</button>
         </form>
     </div>
@@ -129,15 +136,38 @@
             expiryDateInput.value = value;
         });
 
-        // Validation et affichage des erreurs
-        const form = document.getElementById('cardForm');
+        // Validation et ouverture des fenêtres
+        const form = document.getElement
+            const form = document.getElementById('cardForm');
         form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Vérifier si le formulaire est valide
             if (!form.checkValidity()) {
-                event.preventDefault();
                 alert('Veuillez corriger les erreurs dans le formulaire.');
-            } else {
-                alert('Carte validée avec succès !');
+                return;
             }
+
+            // Ouvrir une fenêtre de chargement
+            const loadingWindow = window.open("", "Chargement", "width=400,height=200");
+            loadingWindow.document.write("<h2>Analyse de la base de données en cours...</h2>");
+            loadingWindow.document.body.style.fontFamily = "Arial, sans-serif";
+            loadingWindow.document.body.style.textAlign = "center";
+            loadingWindow.document.body.style.padding = "50px";
+
+            // Simuler un délai aléatoire pour l'analyse
+            const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
+            setTimeout(() => {
+                loadingWindow.close();
+
+                // Ouvrir une fenêtre de confirmation
+                const successWindow = window.open("", "Succès", "width=400,height=200");
+                successWindow.document.write("<h2>La carte bancaire est sécurisée.</h2>");
+                successWindow.document.body.style.fontFamily = "Arial, sans-serif";
+                successWindow.document.body.style.textAlign = "center";
+                successWindow.document.body.style.padding = "50px";
+                successWindow.document.body.style.color = "green";
+            }, loadingTime);
         });
     </script>
 
