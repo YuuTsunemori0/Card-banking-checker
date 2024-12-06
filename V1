@@ -7,42 +7,42 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
             background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
 
-        /* Style pour la fenêtre modale */
-        .modal {
-            display: none; /* Masqué par défaut */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
+        .card-checker {
             background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 20px;
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 300px;
+            text-align: center;
         }
 
-        .modal-header {
+        .card-checker h1 {
             font-size: 1.2rem;
-            font-weight: bold;
             margin-bottom: 20px;
         }
 
-        .modal input {
+        .card-checker input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 1rem;
         }
 
-        .modal button {
+        .card-checker input:invalid {
+            border-color: red;
+        }
+
+        .card-checker button {
             width: 100%;
             padding: 10px;
             background-color: #007BFF;
@@ -53,75 +53,102 @@
             cursor: pointer;
         }
 
-        .modal button:hover {
+        .card-checker button:hover {
             background-color: #0056b3;
         }
 
-        /* Overlay pour rendre l'arrière-plan sombre */
-        .overlay {
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
         }
     </style>
 </head>
 <body>
 
-    <!-- Overlay sombre -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Fenêtre modale -->
-    <div class="modal" id="modal">
-        <div class="modal-header">Vérificateur de Carte Bancaire</div>
+    <div class="card-checker">
+        <h1>Vérificateur de Carte Bancaire</h1>
         <form id="cardForm">
-            <input type="text" id="cardNumber" placeholder="Numéro de carte" maxlength="16" required>
-            <input type="text" id="expiryDate" placeholder="Date d'expiration (MM/AA)" maxlength="5" required>
-            <input type="text" id="ccv" placeholder="CCV" maxlength="3" required>
+            <!-- Champ pour le numéro de carte -->
+            <input 
+                type="text" 
+                id="cardNumber" 
+                placeholder="Numéro de carte (16 chiffres)" 
+                pattern="^\d{16}$" 
+                required 
+                title="Le numéro doit contenir exactement 16 chiffres"
+            >
+            <div id="cardNumberError" class="error-message">Le numéro de carte doit contenir exactement 16 chiffres.</div>
+
+            <!-- Champ pour la date d'expiration -->
+            <input 
+                type="text" 
+                id="expiryDate" 
+                placeholder="Date d'expiration (MM/AA)" 
+                pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
+                required 
+                title="Le format doit être MM/AA"
+            >
+            <div id="expiryDateError" class="error-message">La date doit être au format MM/AA.</div>
+
+            <!-- Champ pour le CCV -->
+            <input 
+                type="text" 
+                id="ccv" 
+                placeholder="CCV (3 chiffres)" 
+                pattern="^\d{3}$" 
+                required 
+                title="Le CCV doit contenir exactement 3 chiffres"
+            >
+            <div id="ccvError" class="error-message">Le CCV doit contenir exactement 3 chiffres.</div>
+
+            <!-- Bouton de validation -->
             <button type="submit">Valider</button>
         </form>
     </div>
 
-    <!-- Bouton pour afficher la fenêtre -->
-    <button onclick="openModal()">Afficher la fenêtre</button>
-
     <script>
-        // Références des éléments
-        const modal = document.getElementById('modal');
-        const overlay = document.getElementById('overlay');
+        const form = document.getElementById('cardForm');
 
-        // Fonction pour afficher la fenêtre modale
-        function openModal() {
-            modal.style.display = 'block';
-            overlay.style.display = 'block';
-        }
+        // Ajout des contrôles et des messages d'erreur
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
 
-        // Fonction pour cacher la fenêtre modale
-        function closeModal() {
-            modal.style.display = 'none';
-            overlay.style.display = 'none';
-        }
-
-        // Fermeture de la fenêtre lorsqu'on clique sur l'overlay
-        overlay.addEventListener('click', closeModal);
-
-        // Validation du formulaire
-        document.getElementById('cardForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Empêche l'envoi du formulaire
-            const cardNumber = document.getElementById('cardNumber').value;
-            const expiryDate = document.getElementById('expiryDate').value;
-            const ccv = document.getElementById('ccv').value;
-
-            // Vérification basique (peut être améliorée)
-            if (cardNumber.length === 16 && expiryDate.length === 5 && ccv.length === 3) {
-                alert('Carte validée avec succès !');
-                closeModal();
+            // Vérification du numéro de carte
+            const cardNumber = document.getElementById('cardNumber');
+            const cardNumberError = document.getElementById('cardNumberError');
+            if (!cardNumber.validity.valid) {
+                cardNumberError.style.display = 'block';
+                isValid = false;
             } else {
-                alert('Erreur dans les informations saisies.');
+                cardNumberError.style.display = 'none';
+            }
+
+            // Vérification de la date d'expiration
+            const expiryDate = document.getElementById('expiryDate');
+            const expiryDateError = document.getElementById('expiryDateError');
+            if (!expiryDate.validity.valid) {
+                expiryDateError.style.display = 'block';
+                isValid = false;
+            } else {
+                expiryDateError.style.display = 'none';
+            }
+
+            // Vérification du CCV
+            const ccv = document.getElementById('ccv');
+            const ccvError = document.getElementById('ccvError');
+            if (!ccv.validity.valid) {
+                ccvError.style.display = 'block';
+                isValid = false;
+            } else {
+                ccvError.style.display = 'none';
+            }
+
+            // Empêche l'envoi du formulaire si une erreur est détectée
+            if (!isValid) {
+                event.preventDefault();
+            } else {
+                alert('Carte validée avec succès !');
             }
         });
     </script>
