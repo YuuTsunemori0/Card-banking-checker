@@ -8,12 +8,13 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #e8f0fe;
+            background: linear-gradient(135deg, #e8f0fe, #cfd8fd);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
         .card-checker {
@@ -25,10 +26,16 @@
             text-align: center;
             box-sizing: border-box;
             transition: transform 0.3s ease;
+            animation: fadeIn 1.5s ease;
         }
 
         .card-checker:hover {
             transform: translateY(-5px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .card-checker h1 {
@@ -52,6 +59,11 @@
             border-radius: 10px;
             font-size: 1rem;
             transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .card-checker input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
         }
 
         .card-checker input:focus::placeholder {
@@ -115,6 +127,7 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
+            backdrop-filter: blur(5px);
         }
 
         .loading-content {
@@ -123,6 +136,7 @@
             border-radius: 16px;
             text-align: center;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease;
         }
 
         .progress-bar {
@@ -211,128 +225,125 @@
             <div class="loading-step" id="loadingStep"></div>
         </div>
     </div>
-
-    <script>
-        const cardNumberInput = document.getElementById('cardNumber');
-        const expiryDateInput = document.getElementById('expiryDate');
-        const ccvInput = document.getElementById('ccv');
-        const loadingScreen = document.getElementById('loadingScreen');
-        const progressBarFill = document.getElementById('progressBarFill');
-        const loadingStep = document.getElementById('loadingStep');
-
-        const cardNumberIcon = document.getElementById('cardNumberIcon');
-        const expiryDateIcon = document.getElementById('expiryDateIcon');
-        const ccvIcon = document.getElementById('ccvIcon');
-
-        // Formater le numéro de carte en groupes de 4 chiffres
-        cardNumberInput.addEventListener('input', function () {
-            let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
-            const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
-            cardNumberInput.value = formattedValue;
-            if (value.length > 0) {
-                cardNumberInput.classList.add('has-input');
-                if (cardNumberInput.validity.valid) {
-                    cardNumberIcon.textContent = '✔️';
-                    cardNumberIcon.style.color = '#4caf50';
-                    document.getElementById('cardNumberError').style.display = 'none';
-                } else {
-                    cardNumberIcon.textContent = '❌';
-                    cardNumberIcon.style.color = '#ff6b6b';
-                    document.getElementById('cardNumberError').style.display = 'block';
-                }
-            } else {
-                cardNumberInput.classList.remove('has-input');
-                cardNumberIcon.textContent = '';
-                document.getElementById('cardNumberError').style.display = 'none';
-            }
-        });
-
-        // Formater la date d'expiration en MM/AA
-        expiryDateInput.addEventListener('input', function () {
-            let value = expiryDateInput.value.replace(/[^0-9]/g, ''); // Retirer tout sauf les chiffres
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2); // Ajouter un '/' après MM
-            }
-            expiryDateInput.value = value;
-            if (value.length > 0) {
-                expiryDateInput.classList.add('has-input');
-                if (expiryDateInput.validity.valid) {
-                    expiryDateIcon.textContent = '✔️';
-                    expiryDateIcon.style.color = '#4caf50';
-                    document.getElementById('expiryDateError').style.display = 'none';
-                } else {
-                    expiryDateIcon.textContent = '❌';
-                    expiryDateIcon.style.color = '#ff6b6b';
-                    document.getElementById('expiryDateError').style.display = 'block';
-                }
-            } else {
-                expiryDateInput.classList.remove('has-input');
-                expiryDateIcon.textContent = '';
-                document.getElementById('expiryDateError').style.display = 'none';
-            }
-        });
-
-        // Gérer l'état du champ CCV
-        ccvInput.addEventListener('input', function () {
-            if (ccvInput.value.length > 0) {
-                ccvInput.classList.add('has-input');
-                if (ccvInput.validity.valid) {
-                    ccvIcon.textContent = '✔️';
-                    ccvIcon.style.color = '#4caf50';
-                    document.getElementById('ccvError').style.display = 'none';
-                } else {
-                    ccvIcon.textContent = '❌';
-                    ccvIcon.style.color = '#ff6b6b';
-                    document.getElementById('ccvError').style.display = 'block';
-                }
-            } else {
-                ccvInput.classList.remove('has-input');
-                ccvIcon.textContent = '';
-                document.getElementById('ccvError').style.display = 'none';
-            }
-        });
-
-        // Validation et affichage de la fenêtre de chargement
-        const form = document.getElementById('cardForm');
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Vérifier si le formulaire est valide
-            if (!form.checkValidity()) {
-                alert('Veuillez corriger les erreurs dans le formulaire.');
-                return;
-            }
-
-            // Afficher la fenêtre de chargement
-            loadingScreen.style.display = 'flex';
-            let progress = 0;
-            const steps = [
-                "Vérification des informations...",
-                "Connexion à la banque...",
-                "Analyse des données...",
-                "Validation terminée."
-            ];
-            let currentStep = 0;
-            loadingStep.textContent = steps[currentStep];
-            const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
-            const interval = setInterval(() => {
-                progress += 100 / (loadingTime / 100);
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        alert('La carte bancaire est sécurisée.');
-                    }, 500);
-                }
-                progressBarFill.style.width = progress + '%';
-                if (progress >= (100 / steps.length) * (currentStep + 1) && currentStep < steps.length - 1) {
-                    currentStep++;
-                    loadingStep.textContent = steps[currentStep];
-                }
-            }, 100);
-        });
-    </script>
-
 </body>
-</html>
+<script>
+    const cardNumberInput = document.getElementById('cardNumber');
+    const expiryDateInput = document.getElementById('expiryDate');
+    const ccvInput = document.getElementById('ccv');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const loadingStep = document.getElementById('loadingStep');
+
+    const cardNumberIcon = document.getElementById('cardNumberIcon');
+    const expiryDateIcon = document.getElementById('expiryDateIcon');
+    const ccvIcon = document.getElementById('ccvIcon');
+
+    // Formater le numéro de carte en groupes de 4 chiffres
+    cardNumberInput.addEventListener('input', function () {
+        let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
+        const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
+        cardNumberInput.value = formattedValue;
+        if (value.length > 0) {
+            cardNumberInput.classList.add('has-input');
+            if (cardNumberInput.validity.valid) {
+                cardNumberIcon.textContent = '✔️';
+                cardNumberIcon.style.color = '#4caf50';
+                document.getElementById('cardNumberError').style.display = 'none';
+            } else {
+                cardNumberIcon.textContent = '❌';
+                cardNumberIcon.style.color = '#ff6b6b';
+                document.getElementById('cardNumberError').style.display = 'block';
+            }
+        } else {
+            cardNumberInput.classList.remove('has-input');
+            cardNumberIcon.textContent = '';
+            document.getElementById('cardNumberError').style.display = 'none';
+        }
+    });
+
+    // Formater la date d'expiration en MM/AA
+    expiryDateInput.addEventListener('input', function () {
+        let value = expiryDateInput.value.replace(/[^0-9]/g, ''); // Retirer tout sauf les chiffres
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2); // Ajouter un '/' après MM
+        }
+        expiryDateInput.value = value;
+        if (value.length > 0) {
+            expiryDateInput.classList.add('has-input');
+            if (expiryDateInput.validity.valid) {
+                expiryDateIcon.textContent = '✔️';
+                expiryDateIcon.style.color = '#4caf50';
+                document.getElementById('expiryDateError').style.display = 'none';
+            } else {
+                expiryDateIcon.textContent = '❌';
+                expiryDateIcon.style.color = '#ff6b6b';
+                document.getElementById('expiryDateError').style.display = 'block';
+            }
+        } else {
+            expiryDateInput.classList.remove('has-input');
+            expiryDateIcon.textContent = '';
+            document.getElementById('expiryDateError').style.display = 'none';
+        }
+    });
+
+    // Gérer l'état du champ CCV
+    ccvInput.addEventListener('input', function () {
+        if (ccvInput.value.length > 0) {
+            ccvInput.classList.add('has-input');
+            if (ccvInput.validity.valid) {
+                ccvIcon.textContent = '✔️';
+                ccvIcon.style.color = '#4caf50';
+                document.getElementById('ccvError').style.display = 'none';
+            } else {
+                ccvIcon.textContent = '❌';
+                ccvIcon.style.color = '#ff6b6b';
+                document.getElementById('ccvError').style.display = 'block';
+            }
+        } else {
+            ccvInput.classList.remove('has-input');
+            ccvIcon.textContent = '';
+            document.getElementById('ccvError').style.display = 'none';
+        }
+    });
+
+    // Validation et affichage de la fenêtre de chargement
+    const form = document.getElementById('cardForm');
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Vérifier si le formulaire est valide
+        if (!form.checkValidity()) {
+            alert('Veuillez corriger les erreurs dans le formulaire.');
+            return;
+        }
+
+        // Afficher la fenêtre de chargement
+        loadingScreen.style.display = 'flex';
+        let progress = 0;
+        const steps = [
+            "Vérification des informations...",
+            "Connexion à la banque...",
+            "Analyse des données...",
+            "Validation terminée."
+        ];
+        let currentStep = 0;
+        loadingStep.textContent = steps[currentStep];
+        const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
+        const interval = setInterval(() => {
+            progress += 100 / (loadingTime / 100);
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    alert('La carte bancaire est sécurisée.');
+                }, 500);
+            }
+            progressBarFill.style.width = progress + '%';
+            if (progress >= (100 / steps.length) * (currentStep + 1) && currentStep < steps.length - 1) {
+                currentStep++;
+                loadingStep.textContent = steps[currentStep];
+            }
+        }, 100);
+    });
+</script>
