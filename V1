@@ -22,6 +22,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 350px;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .card-checker h1 {
@@ -30,8 +31,8 @@
         }
 
         .card-checker input {
-            width: 100%;
-            padding: 15px;
+            width: calc(100% - 20px);
+            padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -49,8 +50,8 @@
         }
 
         .card-checker button {
-            width: 100%;
-            padding: 15px;
+            width: calc(100% - 20px);
+            padding: 10px;
             background-color: #007BFF;
             color: white;
             border: none;
@@ -110,15 +111,25 @@
 
     <script>
         const cardNumberInput = document.getElementById('cardNumber');
+        const expiryDateInput = document.getElementById('expiryDate');
 
         // Formater le numéro de carte en groupes de 4 chiffres
-        cardNumberInput.addEventListener('input', function (event) {
+        cardNumberInput.addEventListener('input', function () {
             let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
             const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
             cardNumberInput.value = formattedValue;
         });
 
-        // Ajout de validations sur le formulaire
+        // Formater la date d'expiration en MM/AA
+        expiryDateInput.addEventListener('input', function () {
+            let value = expiryDateInput.value.replace(/[^0-9]/g, ''); // Retirer tout sauf les chiffres
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2); // Ajouter un '/' après MM
+            }
+            expiryDateInput.value = value;
+        });
+
+        // Validation et affichage des erreurs
         const form = document.getElementById('cardForm');
         form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
