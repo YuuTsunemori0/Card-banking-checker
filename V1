@@ -137,8 +137,7 @@
         });
 
         // Validation et ouverture des fenêtres
-        const form = document.getElement
-            const form = document.getElementById('cardForm');
+        const form = document.getElementById('cardForm');
         form.addEventListener('submit', function (event) {
             event.preventDefault();
 
