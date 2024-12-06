@@ -15,6 +15,36 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #121212, #1c1c1c);
+            color: #ffffff;
+        }
+
+        .dark-mode .card-checker {
+            background: rgba(40, 40, 40, 0.9);
+            color: #ffffff;
+        }
+
+        .dark-mode .card-checker input {
+            background: rgba(60, 60, 60, 0.7);
+            color: #ffffff;
+            border-color: #666;
+        }
+
+        .dark-mode .card-checker input:focus {
+            border-color: #80d8ff;
+            box-shadow: 0 0 8px rgba(128, 216, 255, 0.4);
+        }
+
+        .dark-mode .card-checker button {
+            background: linear-gradient(90deg, #80d8ff, #4fc3f7);
+        }
+
+        .dark-mode .card-checker button:hover {
+            background: linear-gradient(90deg, #4fc3f7, #29b6f6);
         }
 
         .card-checker {
@@ -30,202 +60,45 @@
             backdrop-filter: blur(10px);
         }
 
-        .card-checker:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .card-checker h1 {
-            font-size: 2rem;
-            margin-bottom: 25px;
-            color: #333;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .card-checker input {
-            width: calc(100% - 20px);
-            padding: 15px;
-            margin: 0 auto;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .card-checker input:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
-        }
-
-        .card-checker input:focus::placeholder {
-            color: transparent;
-        }
-
-        .card-checker input.has-input:invalid {
-            border-color: #ff6b6b;
-        }
-
-        .card-checker input.has-input:valid {
-            border-color: #4caf50;
-            box-shadow: 0 0 5px #4caf50;
-        }
-
-        .card-checker .input-group div {
-            position: relative;
-        }
-
-        .card-checker .input-group .icon {
+        .theme-toggle {
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
-            color: #ccc;
-        }
-
-        .card-checker .input-group .error-message {
-            color: #ff6b6b;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .card-checker button {
-            width: calc(100% - 20px);
-            padding: 15px;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
             background: linear-gradient(90deg, #007bff, #00c6ff);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 1.2rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .card-checker button:hover {
+        .theme-toggle:hover {
             background: linear-gradient(90deg, #0056b3, #0099cc);
             transform: translateY(-3px);
-        }
-
-        .loading-screen {
-            display: none;
-            background: rgba(0, 0, 0, 0.5);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            backdrop-filter: blur(5px);
-        }
-
-        .loading-content {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease;
-        }
-
-        .progress-bar {
-            width: 100%;
-            background-color: #f3f3f3;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 15px;
-        }
-
-        .progress-bar-fill {
-            height: 20px;
-            width: 0;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            transition: width 0.1s;
-        }
-
-        .loading-step {
-            margin-top: 10px;
-            font-size: 1rem;
-            color: #333;
-        }
-
-        @keyframes particleAnimation {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-30px); opacity: 0; }
-        }
-
-        .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #ffffff;
-            border-radius: 50%;
-            animation: particleAnimation 1.5s linear infinite;
         }
     </style>
 </head>
 <body>
-
+    <button class="theme-toggle" id="themeToggle">Mode sombre</button>
     <div class="card-checker">
         <h1>Vérificateur de Carte Bancaire</h1>
         <form id="cardForm">
             <div class="input-group">
-                <!-- Champ pour le numéro de carte -->
                 <div>
-                    <input 
-                        type="text" 
-                        id="cardNumber" 
-                        placeholder="Numéro de carte (16 chiffres)" 
-                        maxlength="19" 
-                        required 
-                        pattern="^(\d{4} ){3}\d{4}$" 
-                        title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)"
-                    >
+                    <input type="text" id="cardNumber" placeholder="Numéro de carte (16 chiffres)" maxlength="19" required pattern="^(\d{4} ){3}\d{4}$" title="Le numéro doit contenir exactement 16 chiffres (en groupes de 4)">
                     <span class="icon" id="cardNumberIcon"></span>
                     <div class="error-message" id="cardNumberError">Le numéro de carte doit contenir exactement 16 chiffres.</div>
                 </div>
-
-                <!-- Champ pour la date d'expiration -->
                 <div>
-                    <input 
-                        type="text" 
-                        id="expiryDate" 
-                        placeholder="Date d'expiration (MM/AA)" 
-                        maxlength="5" 
-                        required 
-                        pattern="^(0[1-9]|1[0-2])\/\d{2}$" 
-                        title="Le format doit être MM/AA"
-                    >
+                    <input type="text" id="expiryDate" placeholder="Date d'expiration (MM/AA)" maxlength="5" required pattern="^(0[1-9]|1[0-2])\/\d{2}$" title="Le format doit être MM/AA">
                     <span class="icon" id="expiryDateIcon"></span>
                     <div class="error-message" id="expiryDateError">La date d'expiration doit être au format MM/AA.</div>
                 </div>
-
-                <!-- Champ pour le CCV -->
                 <div>
-                    <input 
-                        type="text" 
-                        id="ccv" 
-                        placeholder="CCV (3 chiffres)" 
-                        maxlength="3" 
-                        required 
-                        pattern="^\d{3}$" 
-                        title="Le CCV doit contenir exactement 3 chiffres"
-                    >
+                    <input type="text" id="ccv" placeholder="CCV (3 chiffres)" maxlength="3" required pattern="^\d{3}$" title="Le CCV doit contenir exactement 3 chiffres">
                     <span class="icon" id="ccvIcon"></span>
                     <div class="error-message" id="ccvError">Le CCV doit contenir exactement 3 chiffres.</div>
                 </div>
@@ -234,135 +107,14 @@
         </form>
     </div>
 
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <h2>Analyse de la base de données en cours...</h2>
-            <div class="progress-bar">
-                <div class="progress-bar-fill" id="progressBarFill"></div>
-            </div>
-            <div class="loading-step" id="loadingStep"></div>
-        </div>
-    </div>
-
     <script>
-        const cardNumberInput = document.getElementById('cardNumber');
-        const expiryDateInput = document.getElementById('expiryDate');
-        const ccvInput = document.getElementById('ccv');
-        const loadingScreen = document.getElementById('loadingScreen');
-        const progressBarFill = document.getElementById('progressBarFill');
-        const loadingStep = document.getElementById('loadingStep');
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
 
-        const cardNumberIcon = document.getElementById('cardNumberIcon');
-        const expiryDateIcon = document.getElementById('expiryDateIcon');
-        const ccvIcon = document.getElementById('ccvIcon');
-
-        // Formater le numéro de carte en groupes de 4 chiffres
-        cardNumberInput.addEventListener('input', function () {
-            let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/gi, ''); // Enlever espaces et caractères non numériques
-            const formattedValue = value.match(/.{1,4}/g)?.join(' ') || ''; // Grouper par 4 chiffres
-            cardNumberInput.value = formattedValue;
-            if (value.length > 0) {
-                cardNumberInput.classList.add('has-input');
-                if (cardNumberInput.validity.valid) {
-                    cardNumberIcon.textContent = '✔️';
-                    cardNumberIcon.style.color = '#4caf50';
-                    document.getElementById('cardNumberError').style.display = 'none';
-                } else {
-                    cardNumberIcon.textContent = '❌';
-                    cardNumberIcon.style.color = '#ff6b6b';
-                    document.getElementById('cardNumberError').style.display = 'block';
-                }
-            } else {
-                cardNumberInput.classList.remove('has-input');
-                cardNumberIcon.textContent = '';
-                document.getElementById('cardNumberError').style.display = 'none';
-            }
-        });
-
-        // Formater la date d'expiration en MM/AA
-        expiryDateInput.addEventListener('input', function () {
-            let value = expiryDateInput.value.replace(/[^0-9]/g, ''); // Retirer tout sauf les chiffres
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2); // Ajouter un '/' après MM
-            }
-            expiryDateInput.value = value;
-            if (value.length > 0) {
-                expiryDateInput.classList.add('has-input');
-                if (expiryDateInput.validity.valid) {
-                    expiryDateIcon.textContent = '✔️';
-                    expiryDateIcon.style.color = '#4caf50';
-                    document.getElementById('expiryDateError').style.display = 'none';
-                } else {
-                    expiryDateIcon.textContent = '❌';
-                    expiryDateIcon.style.color = '#ff6b6b';
-                    document.getElementById('expiryDateError').style.display = 'block';
-                }
-            } else {
-                expiryDateInput.classList.remove('has-input');
-                expiryDateIcon.textContent = '';
-                document.getElementById('expiryDateError').style.display = 'none';
-            }
-        });
-
-        // Gérer l'état du champ CCV
-        ccvInput.addEventListener('input', function () {
-            if (ccvInput.value.length > 0) {
-                ccvInput.classList.add('has-input');
-                if (ccvInput.validity.valid) {
-                    ccvIcon.textContent = '✔️';
-                    ccvIcon.style.color = '#4caf50';
-                    document.getElementById('ccvError').style.display = 'none';
-                } else {
-                    ccvIcon.textContent = '❌';
-                    ccvIcon.style.color = '#ff6b6b';
-                    document.getElementById('ccvError').style.display = 'block';
-                }
-            } else {
-                ccvInput.classList.remove('has-input');
-                ccvIcon.textContent = '';
-                document.getElementById('ccvError').style.display = 'none';
-            }
-        });
-
-        // Validation et affichage de la fenêtre de chargement
-        const form = document.getElementById('cardForm');
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Vérifier si le formulaire est valide
-            if (!form.checkValidity()) {
-                alert('Veuillez corriger les erreurs dans le formulaire.');
-                return;
-            }
-
-            // Afficher la fenêtre de chargement
-            loadingScreen.style.display = 'flex';
-            let progress = 0;
-            const steps = [
-                "Vérification des informations...",
-                "Connexion à la banque...",
-                "Analyse des données...",
-                "Validation terminée."
-            ];
-            let currentStep = 0;
-            loadingStep.textContent = steps[currentStep];
-            const loadingTime = Math.floor(Math.random() * 3000) + 2000; // Entre 2 et 5 secondes
-            const interval = setInterval(() => {
-                progress += 100 / (loadingTime / 100);
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        alert('La carte bancaire est sécurisée.');
-                    }, 500);
-                }
-                progressBarFill.style.width = progress + '%';
-                if (progress >= (100 / steps.length) * (currentStep + 1) && currentStep < steps.length - 1) {
-                    currentStep++;
-                    loadingStep.textContent = steps[currentStep];
-                }
-            }, 100);
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            themeToggle.textContent = body.classList.contains('dark-mode') ? 'Mode clair' : 'Mode sombre';
         });
     </script>
+</body>
 </html>
