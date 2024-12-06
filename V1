@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérificateur de Carte Bancaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        /* Style pour la fenêtre modale */
+        .modal {
+            display: none; /* Masqué par défaut */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Overlay pour rendre l'arrière-plan sombre */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay sombre -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Fenêtre modale -->
+    <div class="modal" id="modal">
+        <div class="modal-header">Vérificateur de Carte Bancaire</div>
+        <form id="cardForm">
+            <input type="text" id="cardNumber" placeholder="Numéro de carte" maxlength="16" required>
+            <input type="text" id="expiryDate" placeholder="Date d'expiration (MM/AA)" maxlength="5" required>
+            <input type="text" id="ccv" placeholder="CCV" maxlength="3" required>
+            <button type="submit">Valider</button>
+        </form>
+    </div>
+
+    <!-- Bouton pour afficher la fenêtre -->
+    <button onclick="openModal()">Afficher la fenêtre</button>
+
+    <script>
+        // Références des éléments
+        const modal = document.getElementById('modal');
+        const overlay = document.getElementById('overlay');
+
+        // Fonction pour afficher la fenêtre modale
+        function openModal() {
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        // Fonction pour cacher la fenêtre modale
+        function closeModal() {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+
+        // Fermeture de la fenêtre lorsqu'on clique sur l'overlay
+        overlay.addEventListener('click', closeModal);
+
+        // Validation du formulaire
+        document.getElementById('cardForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Empêche l'envoi du formulaire
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const ccv = document.getElementById('ccv').value;
+
+            // Vérification basique (peut être améliorée)
+            if (cardNumber.length === 16 && expiryDate.length === 5 && ccv.length === 3) {
+                alert('Carte validée avec succès !');
+                closeModal();
+            } else {
+                alert('Erreur dans les informations saisies.');
+            }
+        });
+    </script>
+
+</body>
+</html>
